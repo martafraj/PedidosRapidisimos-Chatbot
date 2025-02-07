@@ -1,22 +1,22 @@
-from dotenv import load_dotenv 
-import os 
-import json 
-from datetime import date 
-from azure.core.credentials import AzureKeyCredential 
-from azure.ai.language.conversations import ConversationAnalysisClient 
-import streamlit as st
+from dotenv import load_dotenv
+import os
+from azure.core.credentials import AzureKeyCredential
+from azure.ai.language.conversations import ConversationAnalysisClient
 import streamlit as st
 from PIL import Image
+import base64
+from io import BytesIO
 
 def main():
     try:
         # Configuración de la aplicación Streamlit
+        st.set_page_config(page_title='Pedidos Rapidisimos')
 
         logo_path = os.path.join(os.path.dirname(__file__), 'logo.png')
         image = Image.open(logo_path)
         st.markdown("""
             <div style="text-align: center;">
-                <img src="data:image/png;base64,{0}" alt="Logo" style="width:400px;">
+                <img src="data:image/png;base64,{0}" alt="Logo" style="width:300px;"><br>
                 <h1 style="font-size: 48px;">Pedidos Rapidisimos</h1>
             </div>
         """.format(get_image_as_base64(image)), unsafe_allow_html=True)
@@ -30,7 +30,6 @@ def main():
         userText = st.text_input("Ingrese su consulta:", "")
         
         if userText and userText.lower() != 'quit':
-
             # Crear cliente para el modelo de lenguaje
             client = ConversationAnalysisClient(
                 ls_prediction_endpoint, AzureKeyCredential(ls_prediction_key))
@@ -102,9 +101,6 @@ def main():
         st.error(ex)
 
 def get_image_as_base64(image):
-    import base64
-    from io import BytesIO
-
     buffered = BytesIO()
     image.save(buffered, format="PNG")
     img_str = base64.b64encode(buffered.getvalue()).decode()
